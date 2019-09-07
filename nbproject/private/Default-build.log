@@ -1,0 +1,12 @@
+/usr/bin/make -C /lib/modules/5.1.21-050121-generic/build  SUBDIRS=/projekty/opensource/acerhdf modules
+make[1]: Entering directory '/usr/src/linux-headers-5.1.21-050121-generic'
+Makefile:205: ================= WARNING ================
+Makefile:206: 'SUBDIRS' will be removed after Linux 5.3
+Makefile:207: Please use 'M=' or 'KBUILD_EXTMOD' instead
+Makefile:208: ==========================================
+  CC [M]  /projekty/opensource/acerhdf/acerhdf.o
+  Building modules, stage 2.
+  MODPOST 1 modules
+  CC      /projekty/opensource/acerhdf/acerhdf.mod.o
+  LD [M]  /projekty/opensource/acerhdf/acerhdf.ko
+make[1]: Leaving directory '/usr/src/linux-headers-5.1.21-050121-generic'
