@@ -24,7 +24,7 @@
  * 
  * **************** Acer Predator Helios 500 mod ****************
  * Mod to allow more aggressive CPU fan speed control settings
- * Verion 0.1 Beta
+ * Verion 0.2 Beta
  * 
  * The driver is tested on Predator PH517-51 bios V1.06
  * If you have another version of predator please first check if the EC registers also apply to your Predator.
@@ -44,19 +44,29 @@
  * TODO:
  *      - code cleanup
  *      
+ * Added Linux shutdown after reaching the CPU temperature of 89°C
  * 
  * 
  */
 
 //*****************Predator settings *******************************************
 //Calculate AVG temperatue from X samles, one sample 1s
-#define TEMPERATURE_SAMPLES  5
+#define TEMPERATURE_SAMPLES  10
 
 //Minimal allowed Fan speed
 #define MIN_FAN_SPEED 4
 
-static int fan_speed_debug = 1; //enable debug messages to dmesg
-static unsigned int verbose = 1; //show orig driver debug messages
+/*
+ * According to the i7-8750H datasheet,
+ * (https://ark.intel.com/content/www/us/en/ark/products/134906/intel-core-i7-8750h-processor-9m-cache-up-to-4-10-ghz.html) the
+ * CPU's maximum temperature is 100°C
+ *  So, assume 89°C is critical temperature.
+ */
+#define ACERHDF_TEMP_CRIT 89
+
+
+static int fan_speed_debug = 0; //enable debug messages to dmesg
+static unsigned int verbose = 0; //show orig driver debug messages
 //******************************************************************************
 #define pr_fmt(fmt) "acerhdf: " fmt
 
@@ -77,16 +87,9 @@ static unsigned int verbose = 1; //show orig driver debug messages
  */
 #undef START_IN_KERNEL_MODE
 
-#define DRV_VER "0.7.0"
+#define DRV_VER "0.2 beta"
 
-/*
- * According to the Atom N270 datasheet,
- * (http://download.intel.com/design/processor/datashts/320032.pdf) the
- * CPU's optimal operating limits denoted in junction temperature as
- * measured by the on-die thermal monitor are within 0 <= Tj <= 90. So,
- * assume 89°C is critical temperature.
- */
-#define ACERHDF_TEMP_CRIT 89000
+
 #define ACERHDF_FAN_OFF 0
 #define ACERHDF_FAN_AUTO 1
 
@@ -110,7 +113,7 @@ static int kernelmode = 1;
 #endif
 
 static unsigned int interval = 1;
-static unsigned int fanon = 60000;
+static unsigned int fanon = 30;
 static unsigned int fanoff = 53000;
 
 static int samples[TEMPERATURE_SAMPLES];
@@ -552,7 +555,7 @@ static int __init acerhdf_check_hardware(void) {
         return -EINVAL;
     }
 
-    pr_info("Acer Aspire One Fan driver, v.%s\n", DRV_VER);
+    pr_info("Acer Predator Helios 500 Fan driver, v.%s\n", DRV_VER);
 
     if (list_supported) {
         pr_info("List of supported Manufacturer/Model/BIOS:\n");
